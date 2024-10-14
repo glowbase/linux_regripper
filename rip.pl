@@ -1,4 +1,4 @@
-#! c:\perl\bin\perl.exe
+#! /usr/bin/perl
 #-------------------------------------------------------------------------
 # Rip - RegRipper, CLI version
 # Use this utility to run a plugins file or a single plugin against a Reg
@@ -41,8 +41,8 @@ use File::Spec;
 use Encode::Unicode;
 use Digest::MD5;
 use JSON::PP;
-require 'time.pl';
-require 'rr_helper.pl';
+require './time.pl';
+require './rr_helper.pl';
 
 # Included to permit compiling via Perl2Exe
 #perl2exe_include "Parse/Win32Registry.pm";
