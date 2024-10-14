@@ -277,7 +277,7 @@ if ($config{reg} && ($config{auto} || $config{autoTLN})) {
 #		$p = $plugindir.$p;
 		$p = File::Spec->catfile($plugindir,$p);
 		eval {
-			require $p;
+			require "./$p";
 			my $hive    = $pkg->getHive();
 			my @hives = split(/,/,$hive);
 			foreach my $lch (@hives) {
@@ -300,7 +300,7 @@ if ($config{reg} && ($config{auto} || $config{autoTLN})) {
 		eval {
 #			require "plugins/".$plugins{$i}."\.pl";
 			my $plugin_file = File::Spec->catfile($plugindir,$f.".pl");
-			require $plugin_file;
+			require "./$plugin_file";
 			$f->pluginmain($hive);
 		};
 		if ($@) {
