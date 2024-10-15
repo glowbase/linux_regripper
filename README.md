@@ -4,7 +4,7 @@
 
 ### Installation
 ```bash
-curl https://raw.githubusercontent.com/glowbase/linux_regripper/refs/heads/main/setup.sh | bash
+curl https://raw.githubusercontent.com/glowbase/linux_regripper/refs/heads/main/setup.sh | bash && source ~/.bashrc
 ```
 
 ### Use
