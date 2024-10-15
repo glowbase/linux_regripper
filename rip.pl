@@ -1,4 +1,4 @@
-#! /usr/bin/perl
+#! /usr/bin/perl -w -I ./
 #-------------------------------------------------------------------------
 # Rip - RegRipper, CLI version
 # Use this utility to run a plugins file or a single plugin against a Reg
@@ -41,8 +41,8 @@ use File::Spec;
 use Encode::Unicode;
 use Digest::MD5;
 use JSON::PP;
-require './time.pl';
-require './rr_helper.pl';
+require 'time.pl';
+require 'rr_helper.pl';
 
 my %config;
 Getopt::Long::Configure("prefix_pattern=(-|\/)");
@@ -230,7 +230,7 @@ if ($config{reg} && ($config{auto} || $config{autoTLN})) {
 
 		$p = File::Spec->catfile($plugindir,$p);
 		eval {
-			require "./$p";
+			require $p;
 			my $hive    = $pkg->getHive();
 			my @hives = split(/,/,$hive);
 			foreach my $lch (@hives) {
@@ -247,7 +247,7 @@ if ($config{reg} && ($config{auto} || $config{autoTLN})) {
 	foreach my $f (sort keys %files) {
 		eval {
 			my $plugin_file = File::Spec->catfile($plugindir,$f.".pl");
-			require "./$plugin_file";
+			require $plugin_file;
 			$f->pluginmain($hive);
 		};
 		if ($@) {
@@ -269,7 +269,7 @@ if ($config{plugin}) {
 	die $pluginfile." not found.\n" unless (-e $pluginfile);
 	
 	eval {
-		require "./$pluginfile";
+		require $pluginfile;
 		$plugin->pluginmain($hive);
 	};
 	if ($@) {
