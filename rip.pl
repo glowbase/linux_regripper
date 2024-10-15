@@ -1,4 +1,4 @@
-#! /usr/bin/perl -w -I ./
+#! /usr/bin/perl -w -I ./ -I /opt/linux_regripper
 #-------------------------------------------------------------------------
 # Rip - RegRipper, CLI version
 # Use this utility to run a plugins file or a single plugin against a Reg
