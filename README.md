@@ -3,10 +3,8 @@
 
 
 ### Installation
-The following will install `Perl` and the `Parse::Win32Registry` library.
-
 ```bash
-sudo ./setup.sh
+curl https://raw.githubusercontent.com/glowbase/linux_regripper/refs/heads/main/setup.sh | sudo bash
 ```
 
 ### Use
