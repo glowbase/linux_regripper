@@ -81,7 +81,7 @@ if ($config{list}) {
 		my $pkg = (split(/\./,$p,2))[0];
 		$p = File::Spec->catfile($plugindir,$p);
 		eval {
-			require $p;
+			require "./$p";
 			my %plugin   = $pkg->getConfig();
 			my $hive     = $plugin{hive};
 			$hive =~ s/\,/ /g;
