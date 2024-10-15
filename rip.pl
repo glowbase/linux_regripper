@@ -1,4 +1,4 @@
-#! /usr/bin/perl -w -I ./ -I /opt/linux_regripper
+#! /usr/bin/perl -I ./ -I /opt/linux_regripper
 #-------------------------------------------------------------------------
 # Rip - RegRipper, CLI version
 # Use this utility to run a plugins file or a single plugin against a Reg
@@ -48,15 +48,11 @@ my %config;
 Getopt::Long::Configure("prefix_pattern=(-|\/)");
 GetOptions(\%config,qw(reg|r=s file|f=s csv|c dirty|d auto|a autoTLN|aT guess|g user|u=s sys|s=s plugin|p=s update|uP list|l help|?|h));
 
-my @path;
+my @path = split(/\//,$0);
 my $str = $0;
-($^O eq "MSWin32") ? (@path = split(/\\/,$0))
-                   : (@path = split(/\//,$0));
 $str =~ s/($path[scalar(@path) - 1])//;
 
-my $plugindir;
-($^O eq "MSWin32") ? ($plugindir = $str."plugins/")
-                   : ($plugindir = File::Spec->catfile("plugins"));
+my $plugindir = File::Spec->catfile("plugins");
 
 my $VERSION = "4\.0";
 
@@ -81,7 +77,7 @@ if ($config{list}) {
 		my $pkg = (split(/\./,$p,2))[0];
 		$p = File::Spec->catfile($plugindir,$p);
 		eval {
-			require "./$p";
+			require $p;
 			my %plugin   = $pkg->getConfig();
 			my $hive     = $plugin{hive};
 			$hive =~ s/\,/ /g;
