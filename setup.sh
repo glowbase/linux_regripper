@@ -15,7 +15,7 @@ else
     git clone https://github.com/glowbase/linux_regripper.git
 fi
 
-chmod -R o+rx /opt/linux_regripper
+sudo chmod -R o+rx /opt/linux_regripper
 
 # Add alias for regripper
 echo "alias rr='/opt/linux_regripper/rip.pl'" >> ~/.bashrc
