@@ -3,10 +3,10 @@
 
 
 ### Installation
-Ensure you have Perl installed prior to running the following.
+The following will install `Perl` and the `Parse::Win32Registry` library.
 
 ```bash
-perl -MCPAN -e install Parse::Win32Registry
+sudo ./setup.sh
 ```
 
 ### Use

@@ -44,42 +44,20 @@ use JSON::PP;
 require './time.pl';
 require './rr_helper.pl';
 
-# Included to permit compiling via Perl2Exe
-#perl2exe_include "Parse/Win32Registry.pm";
-#perl2exe_include "Parse/Win32Registry/Key.pm";
-#perl2exe_include "Parse/Win32Registry/Entry.pm";
-#perl2exe_include "Parse/Win32Registry/Value.pm";
-#perl2exe_include "Parse/Win32Registry/File.pm";
-#perl2exe_include "Parse/Win32Registry/Win95/File.pm";
-#perl2exe_include "Parse/Win32Registry/Win95/Key.pm";
-#perl2exe_include "Encode.pm";
-#perl2exe_include "Encode/Byte.pm";
-#perl2exe_include "Encode/Unicode.pm";
-#perl2exe_include "utf8.pm";
-#perl2exe_include "unicore/Heavy.pl";
-#perl2exe_include "unicore/To/Upper.pl";
-
 my %config;
 Getopt::Long::Configure("prefix_pattern=(-|\/)");
 GetOptions(\%config,qw(reg|r=s file|f=s csv|c dirty|d auto|a autoTLN|aT guess|g user|u=s sys|s=s plugin|p=s update|uP list|l help|?|h));
 
-# Code updated 20090102
 my @path;
 my $str = $0;
 ($^O eq "MSWin32") ? (@path = split(/\\/,$0))
                    : (@path = split(/\//,$0));
 $str =~ s/($path[scalar(@path) - 1])//;
 
-# Suggested addition by Hal Pomeranz for compatibility with Linux
-#push(@INC,$str);
-# code updated 20190318
 my $plugindir;
 ($^O eq "MSWin32") ? ($plugindir = $str."plugins/")
                    : ($plugindir = File::Spec->catfile("plugins"));
-#my $plugindir = $str."plugins/";
-#my $plugindir = File::Spec->catfile("plugins");
-#print "Plugins Dir = ".$plugindir."\n";
-# End code update
+
 my $VERSION = "4\.0";
 
 if ($config{help} || !%config) {
@@ -101,7 +79,6 @@ if ($config{list}) {
 	foreach my $p (@plugins) {
 		next unless ($p =~ m/\.pl$/);
 		my $pkg = (split(/\./,$p,2))[0];
-#		$p = $plugindir.$p;
 		$p = File::Spec->catfile($plugindir,$p);
 		eval {
 			require $p;
@@ -119,7 +96,6 @@ if ($config{list}) {
 			}
 			else {
 				print $count.". ".$pkg." v.".$version." [".$hive."]\n";
-#				printf "%-20s %-10s %-10s\n",$pkg,$version,$hive;
 				print  "   - ".$descr."\n\n";
 				$count++;
 			}
@@ -137,14 +113,11 @@ if ($config{update}) {
 	opendir(DIR,$plugindir) || die "Could not open $plugindir: $!\n";
 	@plugins = readdir(DIR);
 	closedir(DIR);
-# hash of lists to hold plugin names	
 	my %files = ();
 
 	foreach my $p (@plugins) {
 		next unless ($p =~ m/\.pl$/);
-# $pkg = name of plugin		
 		my $pkg = (split(/\./,$p,2))[0];
-#		$p = $plugindir.$p;
 		$p = File::Spec->catfile($plugindir,$p);
 		eval {
 			require $p;
@@ -162,8 +135,7 @@ if ($config{update}) {
 		};
 		print "Error: $@\n" if ($@);
 	}
-		
-# once hash of lists is populated, print files		
+
 	foreach my $f (keys %files) {
 		my $filepath = $plugindir."\\".$f;
 		open(FH,">",$filepath) || die "Could not open ".$filepath." to write: $!";
@@ -177,22 +149,13 @@ if ($config{update}) {
 	}
 	exit;
 }
-#-------------------------------------------------------------
-# 
-#-------------------------------------------------------------
-if ($config{dirty}) {
-	checkHive($config{reg});
-}
 
 #-------------------------------------------------------------
 # 
 #-------------------------------------------------------------
 if ($config{file}) {
-# First, check that a hive file was identified, and that the path is
-# correct
 	my $hive = $config{reg};
 	die "You must enter a hive file path/name.\n" if ($hive eq "");
-#	die $hive." not found.\n" unless (-e $hive);
 	my %plugins = parsePluginsFile($config{file});
 	if (%plugins) {
 		logMsg("Parsed Plugins file.");
@@ -203,7 +166,6 @@ if ($config{file}) {
 	}
 	foreach my $i (sort {$a <=> $b} keys %plugins) {
 		eval {
-#			require "plugins/".$plugins{$i}."\.pl";
 			my $plugin_file = File::Spec->catfile($plugindir,$plugins{$i}.".pl");
 			require $plugin_file;
 			$plugins{$i}->pluginmain($hive);
@@ -221,17 +183,14 @@ if ($config{file}) {
 # 
 #-------------------------------------------------------------
 if ($config{reg} && $config{guess}) {
-# Attempt to guess which kind of hive we have
 	my $hive = $config{reg};
 	die "You must enter a hive file path/name.\n" if ($hive eq "");
-#	die $hive." not found.\n" unless (-e $hive);
 	
 	my $reg;
 	my $root_key;
 	my %guess = guessHive($hive);
 	
 	foreach my $g (keys %guess) {
-#		::rptMsg(sprintf "%-8s = %-2s",$g,$guess{$g});
 		::rptMsg($g) if ($guess{$g} == 1);
 	}
 }
@@ -240,30 +199,25 @@ if ($config{reg} && $config{guess}) {
 # 
 #-------------------------------------------------------------
 if ($config{reg} && ($config{auto} || $config{autoTLN})) {
-# Attempt to guess which kind of hive we have
 	my $hive = $config{reg};
 	die "You must enter a hive file path/name.\n" if ($hive eq "");
-#	die $hive." not found.\n" unless (-e $hive);
 	
 	my $reg;
 	my $root_key;
 	my %guess = guessHive($hive);
 	my $type = "";
 	foreach my $g (keys %guess) {
-#		::rptMsg(sprintf "%-8s = %-2s",$g,$guess{$g});
 		$type = $g if ($guess{$g} == 1);
 	}
 	
 	my @plugins;
 	opendir(DIR,$plugindir) || die "Could not open $plugindir: $!\n";
 	@plugins = readdir(DIR);
-	closedir(DIR);
-# hash of lists to hold plugin names	
+	closedir(DIR);	
 	my %files = ();
 
 	foreach my $p (@plugins) {
 		next unless ($p =~ m/\.pl$/);
-# $pkg = name of plugin		
 		my $pkg = (split(/\./,$p,2))[0];
 		
 		if ($config{auto}) {
@@ -273,8 +227,7 @@ if ($config{reg} && ($config{auto} || $config{autoTLN})) {
 			next unless ($pkg =~ m/tln$/);
 		}
 		else {}
-				
-#		$p = $plugindir.$p;
+
 		$p = File::Spec->catfile($plugindir,$p);
 		eval {
 			require "./$p";
@@ -290,15 +243,9 @@ if ($config{reg} && ($config{auto} || $config{autoTLN})) {
 		};
 		print "Error: $@\n" if ($@);
 	}
-	
-#	::rptMsg("Plugins to run against ".$type." hive...");
-#	foreach my $f (sort keys %files) {
-#		::rptMsg("  ".$f);
-#	}
-	
+
 	foreach my $f (sort keys %files) {
 		eval {
-#			require "plugins/".$plugins{$i}."\.pl";
 			my $plugin_file = File::Spec->catfile($plugindir,$f.".pl");
 			require "./$plugin_file";
 			$f->pluginmain($hive);
@@ -306,7 +253,6 @@ if ($config{reg} && ($config{auto} || $config{autoTLN})) {
 		if ($@) {
 			logMsg("Error in ".$f.": ".$@);
 		}
-#		logMsg($plugins{$i}." complete.");
 		rptMsg("-" x 40) unless ($config{autoTLN});
 	}
 }
@@ -316,19 +262,14 @@ if ($config{reg} && ($config{auto} || $config{autoTLN})) {
 # 
 #-------------------------------------------------------------
 if ($config{plugin}) {
-# First, check that a hive file was identified, and that the path is
-# correct
 	my $hive = $config{reg};
 	die "You must enter a hive file path/name.\n" if ($hive eq "");
-#	die $hive." not found.\n" unless (-e $hive);	
-# check to see if the plugin exists
 	my $plugin = $config{plugin};
-#	my $pluginfile = $plugindir.$config{plugin}."\.pl";
 	my $pluginfile = File::Spec->catfile($plugindir,$config{plugin}."\.pl");
 	die $pluginfile." not found.\n" unless (-e $pluginfile);
 	
 	eval {
-		require $pluginfile;
+		require "./$pluginfile";
 		$plugin->pluginmain($hive);
 	};
 	if ($@) {
@@ -341,14 +282,10 @@ if ($config{plugin}) {
 #-------------------------------------------------------------
 sub _syntax {
 	print<< "EOT";
-Rip v.$VERSION - CLI RegRipper tool	
+Rip v.$VERSION - CLI RegRipper Tool
+
 Rip [-r Reg hive file] [-f profile] [-p plugin] [options]
 Parse Windows Registry files, using either a single module, or a profile.
-
-NOTE: This tool does NOT automatically process Registry transaction logs! The tool 
-does check to see if the hive is dirty, but does not automatically process the
-transaction logs.  If you need to incorporate transaction logs, please consider 
-using yarp + registryFlush.py, or rla.exe from Eric Zimmerman.
 
   -r [hive] .........Registry hive file to parse
   -d ................Check to see if the hive is dirty 
@@ -363,15 +300,7 @@ using yarp + registryFlush.py, or rla.exe from Eric Zimmerman.
   -u username........User name (TLN support)
   -uP ...............Update default profiles
   -h.................Help (print this information)
-  
-Ex: C:\\>rip -r c:\\case\\system -f system
-    C:\\>rip -r c:\\case\\ntuser.dat -p userassist
-    C:\\>rip -r c:\\case\\ntuser.dat -a
-    C:\\>rip -l -c
 
-All output goes to STDOUT; use redirection (ie, > or >>) to output to a file\.
-  
-copyright 2023 Quantum Analytics Research, LLC
 EOT
 }
 
