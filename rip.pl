@@ -66,9 +66,9 @@ if ($config{help} || !%config) {
 #-------------------------------------------------------------
 if ($config{list}) {
 	my @plugins;
-	opendir(DIR,$plugindir) || die "Could not open $plugindir: $!\n";
-	@plugins = readdir(DIR);
-	closedir(DIR);
+	opendir(__DIR__,$plugindir) || die "Could not open $plugindir: $!\n";
+	@plugins = readdir(__DIR__);
+	closedir(__DIR__);
 
 	my $count = 1; 
 	print "Plugin,Version,Hive,MITRE ATT&CK,Category,Description\n" if ($config{csv});
@@ -106,9 +106,9 @@ if ($config{list}) {
 #-------------------------------------------------------------
 if ($config{update}) {
 	my @plugins;
-	opendir(DIR,$plugindir) || die "Could not open $plugindir: $!\n";
-	@plugins = readdir(DIR);
-	closedir(DIR);
+	opendir(__DIR__, $plugindir) || die "Could not open $plugindir: $!\n";
+	@plugins = readdir(__DIR__);
+	closedir(__DIR__);
 	my %files = ();
 
 	foreach my $p (@plugins) {
@@ -207,9 +207,10 @@ if ($config{reg} && ($config{auto} || $config{autoTLN})) {
 	}
 	
 	my @plugins;
-	opendir(DIR,$plugindir) || die "Could not open $plugindir: $!\n";
+
+	opendir(DIR, $plugindir) || die "Could not open $plugindir: $!\n";
 	@plugins = readdir(DIR);
-	closedir(DIR);	
+	closedir(DIR);
 	my %files = ();
 
 	foreach my $p (@plugins) {
